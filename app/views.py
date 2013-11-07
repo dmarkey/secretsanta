@@ -8,6 +8,8 @@ from forms import NewSecretSantaForm
 def launch(request):
     if request.POST:
         form = NewSecretSantaForm(request.POST)
+        if form.is_valid():
+            form.save()
     else:
         form = NewSecretSantaForm()
 
