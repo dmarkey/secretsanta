@@ -8,9 +8,10 @@ class SecretSantaOrg(models.Model):
     key = models.CharField(max_length=256, primary_key=True)
     managing_user = models.ForeignKey(User, related_name="manager")
     secret_santas = models.ManyToManyField(User)
-    spending_limit = models.IntegerField()
-    due_date = models.DateTimeField()
-    instructions = models.TextField()
+    spending_limit = models.PositiveIntegerField(help_text="The spending limit")
+    closing_date = models.DateTimeField(help_text="The last date/time when people can opt-in")
+    exchange_date = models.DateTimeField(help_text="The date/time the exchange will take place")
+    instructions = models.TextField(help_text="Any additional instructions")
 
     @staticmethod
     def _create_id():

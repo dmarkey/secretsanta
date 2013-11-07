@@ -10,7 +10,8 @@ class NewSecretSantaForm(forms.ModelForm):
         model = SecretSantaOrg
         exclude = ("key", "managing_user", "secret_santas")
         widgets = {
-            'due_date': DateTimeWidget,
+            'exchange_date': DateTimeWidget,
+            'closing_date': DateTimeWidget,
         }
 
 
