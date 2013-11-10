@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load bootstrap_toolkit %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{org.name}}</h1>
+    <table class="table">
+
+    <tr><td>Status: </td><td>{{ org.get_status }}</td></tr>
+    <tr><td>Organised By</td><td>{{  org.managing_user.email }}</td></tr>
+    <tr><td>URL to distibute</td><td id="url"></td></tr>
+    <tr><td>Closing Date</td><td>{{org.closing_date}}({{  org.closing_date|timeuntil }} from now)</td></tr>
+    <tr><td>Exchange Date</td><td>{{ org.exchange_date }}({{  org.exchange_date|timeuntil }} from now)</td></tr>
+    <tr><td>Spending Limit:</td><td>€{{ org.spending_limit}}</td></tr>
+    <tr><td>Instructions:</td><td>{{  org.instructions }}</td></tr>
+    <tr><td>Registered Participants:</td><td>
+
+    {% if org.participants %}
+    {% for p in org.get_participants %}
+        <p>{{ p }}</p>
+    {% endfor %}
+    {% else %}
+    Nobody has registered for this Secret Santa yet.
+    {% endif %}
+
+    </td></tr>
+    </table>
+
+
+
+
+    {% if org.open_for_registration %}
+    <h2>Register:</h2>
+    <form class="form-{{ layout }}" action="" method="post">
+        {% csrf_token %}
+        {{ form|as_bootstrap:layout }}
+        {% if layout == "horizontal" %}
+            <p class="form-actions">
+                <input type="submit" value="Submit" class="btn btn-primary">
+            </p>
+        {% else %}
+            <input type="submit" value="Submit" class="btn btn-primary">
+        {% endif %}
+    </form>
+    {%  endif  %}
+
+<script>
+$("#url").html(document.URL)
+</script>
+{% endblock content %}
