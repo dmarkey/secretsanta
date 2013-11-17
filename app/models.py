@@ -3,12 +3,12 @@ from django.contrib.auth.models import User
 import uuid
 import datetime
 
+
 class SecretSantaOrg(models.Model):
     unique_id = models.CharField(max_length=108, primary_key=True)
     name = models.CharField(max_length=256, help_text="Acme secret santa, for example", blank=False, null=False)
-    managing_user = models.ForeignKey(User, related_name="manager")
-    participants = models.TextField()
     status = models.CharField(max_length=32, default="NOT_SENT")
+    secret_key = models.CharField(max_length=256)
     spending_limit = models.PositiveIntegerField(help_text="The spending limit", blank=False, null=False)
     closing_date = models.DateTimeField(help_text="The last date/time when people can opt-in", blank=False, null=False)
     exchange_date = models.DateTimeField(help_text="The date/time the exchange will take place", blank=False, null=False)
@@ -33,16 +33,27 @@ class SecretSantaOrg(models.Model):
         return "Currently accepting registrations"
 
     def get_participants(self):
-        return self.participants.split(";")
+        return self.participant_set.all()
 
     def add_participant(self, email):
-        current_participants = self.get_participants()
-        current_participants.append(email.lower())
-        self.participants = ";".join(current_participants)
-        self.save()
-
+        if not self.participant_set.all().filter(email=email):
+            Participant(email=email, org=self).save()
 
     def save(self, *args, **kwargs):
         if self.unique_id == '':
-            self.unique_id = str(uuid.uuid4()) + str(uuid.uuid4()) + str(uuid.uuid4())
+            unique_id = str(uuid.uuid4()) + str(uuid.uuid4()) + str(uuid.uuid4())
+            self.unique_id = unique_id.replace("-", "")
+        if self.secret_key == '':
+            self.secret_key = User.objects.make_random_password(length=16)
         super(SecretSantaOrg, self).save(*args, **kwargs)
+
+
+class Participant(models.Model):
+    email = models.EmailField()
+    secret_key = models.CharField(max_length=500)
+    org = models.ForeignKey(SecretSantaOrg)
+
+    def save(self, *args, **kwargs):
+        if self.secret_key == "":
+            self.secret_key = User.objects.make_random_password(length=16)
+        super(Participant, self).save(*args, **kwargs)

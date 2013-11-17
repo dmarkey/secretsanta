@@ -19,9 +19,9 @@
     <tr><td>Instructions:</td><td>{{  org.instructions }}</td></tr>
     <tr><td>Registered Participants:</td><td>
 
-    {% if org.participants %}
+    {% if org.get_participants %}
     {% for p in org.get_participants %}
-        <p>{{ p }}</p>
+        <p>{{ p.email }}</p>
     {% endfor %}
     {% else %}
     Nobody has registered for this Secret Santa yet.
